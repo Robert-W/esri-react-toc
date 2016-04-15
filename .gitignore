@@ -1,0 +1,10 @@
+# Dependencies
+node_modules
+
+# Built files
+build
+dist
+
+# System files
+.DS_Store
+

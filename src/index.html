@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>esri-react-toc</title>
+    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="//js.arcgis.com/4.0beta3/esri/css/main.css">
+    <script>
+      var base = location.href.replace(/\/[^/]+$/, '');
+      var dojoConfig = {
+        parseOnLoad: false,
+        async: true,
+        packages: [
+          { name: 'root', location: base },
+          { name: 'toc', location: base + '/toc' },
+          { name: 'vendor', location: base + '/vendor' },
+          { name: 'components', location: base + '/components' }
+        ],
+        aliases: [
+          ['react', 'vendor/react/react.min'],
+          ['react-dom', 'vendor/react/react-dom.min']
+        ],
+        deps: ['dojo/domReady!'],
+        callback: function () {
+          require(['root/app']);
+        }
+      };
+    </script>
+    <script src="//js.arcgis.com/4.0beta3/init.js"></script>
+    <style>
+      html, body, #app-mount, .root {
+        overflow: hidden;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app-mount"></div>
+  </body>
+</html>

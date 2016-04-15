@@ -1,0 +1,32 @@
+.app-header {
+  background: rgba(13, 120, 209, 0.8);
+  align-items: center;
+  position: absolute;
+  padding-left: 10px;
+  display: flex;
+  height: 60px;
+  width: 100%;
+  z-index: 5;
+  left: 0;
+  top: 0;
+}
+
+.esri-ui .esri-ui-top-left {
+  top: 60px;
+}
+
+.view-container {
+  height: 100%;
+  width: 100%;
+}
+
+.toc-container {
+  position: absolute;
+  background: white;
+  overflow-y: auto;
+  bottom: 70px;
+  width: 300px;
+  right: 20px;
+  z-index: 5;
+  top: 80px;
+}

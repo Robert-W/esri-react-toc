@@ -1,0 +1,6 @@
+{
+  "name": "esri-react-toc",
+  "dependencies": {
+    "react": "~15.0.1"
+  }
+}
