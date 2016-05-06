@@ -1,7 +1,7 @@
 {
   "name": "esri-react-toc",
   "version": "0.1.0",
-  "description": "TOC widget for Esri's 4.0 (beta3) javascript API.",
+  "description": "TOC widget for Esri's 4.0 javascript API.",
   "main": "gulpfile.js",
   "scripts": {
     "start": "npm run babel -- -w & gulp start",
@@ -20,7 +20,8 @@
     "flexbox",
     "toc",
     "arcgis",
-    "javascript"
+    "javascript",
+    "4.0"
   ],
   "author": "Robert-W",
   "license": "MIT",
