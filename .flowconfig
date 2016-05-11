@@ -1,0 +1,20 @@
+[include]
+src/**/*.js
+[ignore]
+.*/node_modules
+# [libs]
+# declarations
+[options]
+module.name_mapper='root'->'<PROJECT_ROOT>/src/'
+module.name_mapper='toc'->'<PROJECT_ROOT>/src/toc'
+module.name_mapper='vendor'->'<PROJECT_ROOT>/build/vendor/'
+module.name_mapper='components'->'<PROJECT_ROOT>/src/components/'
+module.name_mapper='react'->'<PROJECT_ROOT>/build/vendor/react/react.min'
+module.name_mapper='react-dom'->'<PROJECT_ROOT>/build/vendor/react/react-dom.min'
+# These modules are not using Flow types and are not available locally
+# Redirect Flow to a local file for those so it does not show as an error
+module.name_mapper='esri\/.*'->'<PROJECT_ROOT>/src/app.js'
+module.name_mapper='dojo\/.*'->'<PROJECT_ROOT>/src/app.js'
+module.name_mapper='dijit\/.*'->'<PROJECT_ROOT>/src/app.js'
+esproposal.class_static_fields=enable
+esproposal.class_instance_fields=enable
