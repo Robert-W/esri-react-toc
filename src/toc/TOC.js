@@ -5,47 +5,67 @@ import esriRequest from 'esri/request';
 /**
 * Custom Flow Types for the Table of Contents Widget
 */
+// TOC
+type TOCProps = {
+  view: ArcGISView,
+
+  // don't add inline styles
+  noStyle?: boolean
+};
+// TOC
+type TOCState = {
+  loaded: boolean,
+  scale: number
+};
+// TOCLayer
+type TOCLayerProps = {
+  scale: number,
+  noStyle: boolean,
+  layer: ArcGISLayer,
+  initialChecked: boolean
+};
+// TOCLayer
+type TOCLayerState = {
+  checked: boolean,
+  legendItems?: Array<LegendItem>
+};
+// Esri View properties I need
 type ArcGISView = {
   map: {
     findLayerById(layerId: string):any,
     layers: {
       items: Array<ArcGISLayer>
     }
-  }
+  },
+  ready: boolean,
+  scale: number
 };
-
+// Esri Layer properties I need
 type ArcGISLayer = {
   id: string,
   url: string,
   title: string,
   visible: boolean
 };
-
+// Legend
 type LegendProps = {
   items: Array<LegendItem>,
-  scale: number // View Scale
+  scale: number, // View Scale
+  noStyle?: boolean
 };
-
-type LegendInfo = {
+// Legend
+type LegendRowProps = {
   imageData: string,
-  label: string
+  label: string,
+  noStyle?: boolean
 };
-
+// Legend
 type LegendItem = {
   layerName: string,
-  legend: Array<LegendInfo>,
+  legend: Array<LegendRowProps>,
   minScale: number,
   maxScale: number,
   layerId: string
-};
-
-type TOCProps = {
-  view: ArcGISView
-};
-
-type TOCState = {
-  loaded: boolean,
-  legends: {[key:string]:LegendProps}
 };
 
 /**
@@ -63,36 +83,54 @@ const styles = {
   },
   layerLabel: {
     paddingLeft: '1em'
+  },
+  legendTitle: {
+    padding: '0.5em 0',
+    fontWeight: 'bold'
+  },
+  legendRow: {
+    display: 'flex',
+    alignItems: 'center'
+  },
+  legendRowLabel: {
+    paddingLeft: '0.5em'
   }
 };
 
 /**
-* Legend Widget and Helper Components
+* Legend Row for the Legend Component
 */
-const LegendRow = function LegendRow (props: LegendInfo) {
+const LegendRow = function LegendRow (props: LegendRowProps) {
   return (
-    <div className='toc__legend-item-row'>
+    <div className='toc__legend-item__row' style={props.noStyle ? undefined : styles.legendRow}>
       <img src={`data:image/png;base64,${props.imageData}`} />
-      <label>{props.label}</label>
+      <label className='toc__legend-item__row-label' style={props.noStyle ? undefined : styles.legendRowLabel}>
+        {props.label}
+      </label>
     </div>
   );
 };
 
+/**
+* Legend to display
+*/
 const Legend = function Legend (props: LegendProps) {
-  const {items, scale} = props;
+  const {items, scale, noStyle} = props;
   //- remove any non-visible layers due to scale
   let legendItems = items.filter((legendItem: LegendItem) => {
-    return legendItem.minScale < scale && scale < legendItem.maxScale;
+    return (legendItem.minScale > scale || legendItem.minScale === 0) && scale > legendItem.maxScale;
   });
   // Generate the legend item
   return (
     <div className='toc__legend'>
       {legendItems.map((legendItem: LegendItem) => {
         const {legend} = legendItem;
-        const rows = legend ? legend.map((info) => <LegendRow {...info} />) : null;
+        const rows = legend ? legend.map((info) => <LegendRow {...info} noStyle={noStyle} />) : null;
         return (
           <div className='toc__legend-item'>
-            <div className='toc__legend-item-title'>{legendItem.layerName}</div>
+            <div className='toc__legend-item-title' style={noStyle ? undefined : styles.legendTitle}>
+              {legendItem.layerName}
+            </div>
             {rows}
           </div>
         );
@@ -100,6 +138,84 @@ const Legend = function Legend (props: LegendProps) {
     </div>
   );
 };
+
+/**
+* Table of Contents Layer Component
+*/
+class TOCLayer extends Component {
+
+  displayName: 'TOCLayer';
+  props: TOCLayerProps;
+  state: TOCLayerState;
+
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      checked: props.initialChecked,
+      legendItems: undefined
+    };
+
+    if (props.initialChecked) {
+      this.getLegend(props.layer);
+    }
+  }
+
+  getLegend:Function = (arcgisLayer: ArcGISLayer) => {
+    esriRequest(`${arcgisLayer.url}/legend`, { query: { f: 'json' }}).then((info) => {
+      let items: Array<LegendItem> = info.data && info.data.layers;
+      if (items && items.length) {
+        this.setState({ legendItems: items });
+      }
+    });
+  };
+
+  toggle = () => {
+    const {legendItems} = this.state;
+    const {layer} = this.props;
+    this.setState({ checked: !layer.visible });
+    // Update the Map
+    layer.visible = !layer.visible;
+    // Get the legend if we havent already done so
+    if (!legendItems) {
+      this.getLegend(layer);
+    }
+  };
+
+  render () {
+    const {checked, legendItems} = this.state;
+    const {layer, scale, noStyle} = this.props;
+    let legend;
+
+    if (legendItems && layer.visible) {
+      legend = <Legend {...this.props} scale={scale} items={legendItems} />;
+    }
+
+    return (
+      <div
+        key={layer.id}
+        className={`toc__layer${checked ? 'active' : ''}`}
+        style={noStyle ? undefined : styles.layer} >
+        <div className='toc__layer-control'>
+          <input
+            id={`toc__${layer.id}`}
+            onChange={this.toggle}
+            checked={checked}
+            type='checkbox' />
+          <label
+            htmlFor={`toc__${layer.id}`}
+            className='toc__layer-label'
+            style={noStyle ? undefined : styles.layerLabel} >
+            {layer.title}
+          </label>
+        </div>
+        {legend}
+      </div>
+    );
+  }
+
+}
+
 
 /**
 * Table of Contents Widget
@@ -112,8 +228,12 @@ export default class TOC extends Component {
 
   state: TOCState = {
     loaded: false,
-    legends: {}
+    scale: 0
   };
+
+  // static defaultProps = {
+  //   noStyle: false
+  // };
 
   constructor (props: TOCProps) {
     super(props);
@@ -135,18 +255,23 @@ export default class TOC extends Component {
   }
 
   initialize:Function = () => {
-    const layers:Array<ArcGISLayer> = this.getLayers();
-    window.view = this.props.view;
-    // Attach listeners
+    const {scale} = this.state;
+    const {view} = this.props;
 
-    // Get Legends for visible layers, the rest will be loaded when the layer is first activated
-    layers.forEach((layer) => {
-      if (layer.legendEnabled && layer.visible) {
-        this.getLegend(layer);
+    // Attach listeners
+    // TODO, See if there is a more efficient way to listen to scale changes
+    // this fires quite a bit on zoom
+    view.watch('scale', () => {
+      if (view.scale !== scale) {
+        this.setState({ scale: view.scale });
       }
     });
 
-    this.setState({ loaded: true });
+    // Update state
+    this.setState({
+      loaded: true,
+      scale: view.scale
+    });
   };
 
   getLayers:Function = () => {
@@ -154,73 +279,25 @@ export default class TOC extends Component {
     return view.map && view.map.layers && view.map.layers.items || [];
   };
 
-  getLegend:Function = (arcgisLayer: ArcGISLayer) => {
-    esriRequest(`${arcgisLayer.url}/legend`, { query: { f: 'json' }}).then((info) => {
-      let items: Array<LegendItem> = info.data && info.data.layers;
-      // Update the legends cache
-      if (items && items.length) {
-        const {legends} = this.state;
-        legends[arcgisLayer.id] = { items };
-        this.setState({ legends });
-      }
-    });
-  };
-
   /**
   * TOC Events
   */
-  toggle:Function = ({currentTarget}:any) => {
-    const layerId = currentTarget.getAttribute('data-layer-id');
-    const {view} = this.props;
-
-    //- Update the layer
-    if (view.map && layerId) {
-      const layer = view.map.findLayerById(layerId);
-      layer.visible = !layer.visible;
-      this.forceUpdate();
-      //- Get the legend info for this layer if we have not already done so
-      const {legends} = this.state;
-      if (!legends[layer.id]) {
-        this.getLegend(layer);
-      }
-    }
-  };
 
   /**
   * Rendering Functions
   */
-  renderLayers:Function = (layer: ArcGISLayer) => {
-    const {legends} = this.state;
-    const {view} = this.props;
-    let legend;
-
-    if (legends[layer.id]) {
-      legend = <Legend scale={view.scale} {...legends[layer.id]} />;
-    }
-
-    return (
-      <div key={layer.id} className={`toc__layer${layer.visible ? ' active' : ''}`} style={styles.layer}>
-        <div className='toc__layer-control'>
-          <input type='checkbox'
-            onChange={this.toggle}
-            id={`toc__${layer.id}`}
-            checked={layer.visible}
-            data-layer-id={layer.id} />
-          <label htmlFor={`toc__${layer.id}`} className='toc__layer-label' style={styles.layerLabel}>
-            {layer.title}
-          </label>
-        </div>
-        {legend}
-      </div>
-    );
+  renderTOCLayers:Function = (layer: ArcGISLayer) => {
+    const {view, ...other} = this.props;
+    return <TOCLayer {...other} scale={view.scale} layer={layer} initialChecked={layer.visible} />;
   };
 
   render () {
     const layers:Array<ArcGISLayer> = this.getLayers();
+    const {style} = this.props;
 
     return (
-      <div className='toc' style={styles.toc}>
-        {layers.map(this.renderLayers)}
+      <div className='toc' style={style ? styles.toc : undefined}>
+        {layers.map(this.renderTOCLayers)}
       </div>
     );
   }

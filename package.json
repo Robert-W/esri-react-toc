@@ -8,7 +8,7 @@
     "babel": "babel src --out-dir build",
     "postinstall": "bower install",
     "test": "flow check;",
-    "dist": "gulp start;"
+    "dist": ""
   },
   "repository": {
     "type": "git",
