@@ -19,4 +19,4 @@ Name|Type|Default|Description
 ### Usage - Coming Soon
 
 ### Contributing
-Code is written in ES6 with Flow.  All contributions must pass `npm test`, which is `flow check` and `eslint` on the `src/toc/TOC.js` file.
+Code is written in ES6 with Flow.  All contributions must pass `npm test`, which is `flow check` and `eslint` on the `src/toc/TOC.js` file.  There is a list of remaining tasks under the TODO ticket.
