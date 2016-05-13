@@ -10,7 +10,10 @@ type TOCProps = {
   view: ArcGISView,
 
   // don't add inline styles
-  noStyle?: boolean
+  noStyle?: boolean,
+  // Function for users to get notified of layer updates, it will pass
+  // back a reference to the layer that updated
+  layerDidUpdate?: Function
 };
 // TOC
 type TOCState = {
@@ -22,30 +25,13 @@ type TOCLayerProps = {
   scale: number,
   noStyle: boolean,
   layer: ArcGISLayer,
-  initialChecked: boolean
+  initialChecked: boolean,
+  layerDidUpdate?: Function
 };
 // TOCLayer
 type TOCLayerState = {
   checked: boolean,
   legendItems?: Array<LegendItem>
-};
-// Esri View properties I need
-type ArcGISView = {
-  map: {
-    findLayerById(layerId: string):any,
-    layers: {
-      items: Array<ArcGISLayer>
-    }
-  },
-  ready: boolean,
-  scale: number
-};
-// Esri Layer properties I need
-type ArcGISLayer = {
-  id: string,
-  url: string,
-  title: string,
-  visible: boolean
 };
 // Legend
 type LegendProps = {
@@ -66,6 +52,25 @@ type LegendItem = {
   minScale: number,
   maxScale: number,
   layerId: string
+};
+// Esri View properties I need
+type ArcGISView = {
+  map: {
+    findLayerById(layerId: string):any,
+    layers: {
+      items: Array<ArcGISLayer>
+    }
+  },
+  ready: boolean,
+  scale: number,
+  watch(property:string, callback:Function):any
+};
+// Esri Layer properties I need
+type ArcGISLayer = {
+  id: string,
+  url: string,
+  title: string,
+  visible: boolean
 };
 
 /**
@@ -172,13 +177,17 @@ class TOCLayer extends Component {
 
   toggle = () => {
     const {legendItems} = this.state;
-    const {layer} = this.props;
+    const {layer, layerDidUpdate} = this.props;
     this.setState({ checked: !layer.visible });
     // Update the Map
     layer.visible = !layer.visible;
     // Get the legend if we havent already done so
     if (!legendItems) {
       this.getLegend(layer);
+    }
+
+    if (layerDidUpdate) {
+      layerDidUpdate(layer);
     }
   };
 
@@ -188,7 +197,7 @@ class TOCLayer extends Component {
     let legend;
 
     if (legendItems && layer.visible) {
-      legend = <Legend {...this.props} scale={scale} items={legendItems} />;
+      legend = <Legend noStyle={noStyle} scale={scale} items={legendItems} />;
     }
 
     return (
@@ -293,10 +302,10 @@ export default class TOC extends Component {
 
   render () {
     const layers:Array<ArcGISLayer> = this.getLayers();
-    const {style} = this.props;
+    const {noStyle} = this.props;
 
     return (
-      <div className='toc' style={style ? styles.toc : undefined}>
+      <div className='toc' style={noStyle ? undefined : styles.toc}>
         {layers.map(this.renderTOCLayers)}
       </div>
     );
