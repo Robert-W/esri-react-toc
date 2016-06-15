@@ -13,7 +13,7 @@ TOC widget for Esri's 4.0 Javascript API.
 Name|Type|Default|Description
 ---|---|---|---|
 `view`|`esri/views/MapView`, `esri/views/SceneView`|`{}`|Instance of an ArcGIS MapView. View must contain either a `Map` or a `WebMap`.
-`noStyle`|`boolean`|`false`|If false, this uses some very basic inline styles for structure.  You can omit these and add your own via the provided css classes.
+`inlineStyle`|`boolean`|`falsy`|If false, this uses some very basic inline styles for structure.  You can omit these and add your own via the provided css classes.
 `layerDidUpdate`|`function`|`none`|Optional callback to pass in to be invoked when a layer turns on or off.  The sole argument the function receives is the Esri `Layer` object that changed.
 
 ### Usage - Coming Soon

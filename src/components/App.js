@@ -3,8 +3,8 @@
 // import ImageryLayer from 'esri/layers/ImageryLayer';
 import MapView from 'esri/views/MapView';
 import React, {Component} from 'react';
+import TocWidget from 'toc/Toc-widget';
 import WebMap from 'esri/WebMap';
-import TOCWidget from 'toc/TOC';
 // import Map from 'esri/Map';
 
 export default class App extends Component {
@@ -44,7 +44,7 @@ export default class App extends Component {
 
     // Create a Webmap
     const webmap = new WebMap({
-      portalItem: { id: '6978b0738db34f948403cbfaf617f011' }
+      portalItem: { id: '9b6aa8982b7f41f9a6699b855765d5a9' }
     });
 
     // Finally, create the map view
@@ -72,7 +72,7 @@ export default class App extends Component {
         </header>
         <section ref='viewContainer' className='view-container'>
           <div className='toc-container'>
-            <TOCWidget view={this.view} />
+            <TocWidget noStyle={false} view={this.view} />
           </div>
         </section>
       </div>
