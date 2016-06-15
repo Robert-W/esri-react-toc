@@ -45,6 +45,7 @@ export type Sublayer = {
 export type LegendProps = {
   scale: number, // View Scale
   items: Array<LegendItem>,
+  noTitle?: boolean,
   inlineStyle?: boolean
 };
 

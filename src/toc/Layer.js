@@ -94,12 +94,20 @@ export class MapImageLayer extends Component {
       layers = sublayers.filter((sublayer) => isVisibleAtScale(sublayer, scale)).map((sublayer) => {
         const active = activeLayers.indexOf(sublayer.id) > -1;
         const id = `${layer.id}-${sublayer.id}`;
+        let legend, legendItem;
+
+        if (legendItems && sublayer.visible) {
+          legendItem = legendItems.filter(item => item.layerId === sublayer.id);
+          legend = <Legend inlineStyle={inlineStyle} scale={scale} items={legendItem} noTitle={true} />;
+        }
+
         return (
           <div className='toc__sublayer'>
             <input data-layer={sublayer.id} id={id} onChange={this.toggle} checked={active} type='checkbox' />
             <label htmlFor={id} className='toc__layer-label' style={inlineStyle ? styles.layerLabel : null}>
               {sublayer.title}
             </label>
+            {legend}
           </div>
         );
       });

@@ -45,7 +45,7 @@ export default class Legend extends Component {
   props: LegendProps;
 
   render () {
-    const {items, scale, inlineStyle} = this.props;
+    const {items, scale, inlineStyle, noTitle} = this.props;
 
     const legendItems = items.filter((legendItem: LegendItem) => {
       return (legendItem.minScale > scale || legendItem.minScale === 0) && scale > legendItem.maxScale;
@@ -58,9 +58,11 @@ export default class Legend extends Component {
           const rows = legend ? legend.map((info) => <LegendRow {...info} inlineStyle={inlineStyle} />) : null;
           return (
             <div className='toc__legend-item'>
-              <div className='toc__legend-item-title' style={inlineStyle ? styles.legendTitle : null}>
-                {legendItem.layerName}
-              </div>
+              {noTitle ? null :
+                <div className='toc__legend-item-title' style={inlineStyle ? styles.legendTitle : null}>
+                  {legendItem.layerName}
+                </div>
+              }
               {rows}
             </div>
           );
