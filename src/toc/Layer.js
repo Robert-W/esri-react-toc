@@ -82,6 +82,17 @@ export class MapImageLayer extends Component {
     }
   };
 
+  toggleAll = ({target}) => {
+    const {layer} = this.props;
+    const {checked} = target;
+    // Turn them all on or off, update state and then update the layers
+    const activeLayers = checked ? layer.sublayers.map((sublayer) => sublayer.id) : [];
+    this.setState({ activeLayers, checked });
+
+    layer.visible = checked;
+    layer.sublayers.forEach((sublayer) => { sublayer.visible = checked; });
+  };
+
   render () {
     const {checked, legendItems, loaded, activeLayers} = this.state;
     const {layer, scale, inlineStyle} = this.props;
@@ -118,6 +129,10 @@ export class MapImageLayer extends Component {
         key={layer.id}
         style={inlineStyle ? styles.layer : null}
         className={getActiveClassName('toc__map-image-layer', checked)}>
+        <input id={layer.id} onChange={this.toggleAll} checked={checked} type='checkbox' />
+        <label htmlFor={layer.id} className='toc__layer-label' style={inlineStyle ? styles.layerLabel : null}>
+          {layer.title}
+        </label>
         {layers}
       </div>
     );
