@@ -8,8 +8,7 @@
     "babel": "babel src --out-dir build",
     "postinstall": "bower install",
     "test": "flow check;eslint src/toc/*.js;",
-    "dist-es6": "rm -rf dist-es6;BABEL_ENV=production-es6 babel src/toc --out-dir dist-es6",
-    "dist-amd": "rm -rf dist-amd;BABEL_ENV=production node ./build"
+    "dist": "rm -rf dist;BABEL_ENV=production node ./build"
   },
   "repository": {
     "type": "git",
