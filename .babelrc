@@ -1,14 +1,19 @@
 {
   "env": {
     "production": {
-      "plugins": ["transform-es2015-modules-amd"]
+      "plugins": ["babel-plugin-transform-flow-strip-types"],
+      "presets": ["react", "es2015-rollup", "stage-0"]
+    },
+    "production-es6": {
+      "plugins": ["babel-plugin-transform-flow-strip-types"],
+      "presets": ["react", "es2015", "stage-0"]
     },
     "development": {
-      "plugins": ["transform-es2015-modules-amd"],
+      "plugins": ["transform-es2015-modules-amd", "babel-plugin-transform-flow-strip-types"],
+      "presets": ["react", "es2015", "stage-0"],
       "sourceMaps": "inline"
     }
   },
-  "presets": ["react", "es2015", "stage-0"],
   "ignore": [
     "build",
     "node_modules"

@@ -8,9 +8,8 @@
     "babel": "babel src --out-dir build",
     "postinstall": "bower install",
     "test": "flow check;eslint src/toc/*.js;",
-    "dist": "",
-    "dist-es6": "rm -rf dist-es6;",
-    "dist-amd": "rm -rf dist-amd;"
+    "dist-es6": "rm -rf dist-es6;BABEL_ENV=production-es6 babel src/toc --out-dir dist-es6",
+    "dist-amd": "rm -rf dist-amd;BABEL_ENV=production node ./build"
   },
   "repository": {
     "type": "git",
@@ -44,9 +43,13 @@
   },
   "devDependencies": {
     "babel-eslint": "^6.0.2",
+    "babel-preset-es2015-rollup": "^1.1.1",
     "browser-sync": "^2.12.3",
     "eslint": "^2.7.0",
     "eslint-plugin-react": "^4.3.0",
-    "gulp": "^3.9.1"
+    "gulp": "^3.9.1",
+    "rollup": "^0.31.2",
+    "rollup-plugin-babel": "^2.5.1",
+    "uglify-js": "^2.6.2"
   }
 }
